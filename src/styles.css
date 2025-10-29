@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Global mobile overflow prevention */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Prevent any element from exceeding viewport width */
+* {
+  max-width: 100%;
+}
+
+/* Allow specific elements to be full width */
+html, body, div, section, article, main, header, footer {
+  max-width: none;
+}

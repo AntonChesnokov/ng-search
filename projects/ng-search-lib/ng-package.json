@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../dist/ng-search-lib",
+  "lib": {
+    "entryFile": "src/public-api.ts",
+    "flatModuleFile": "ng-search-core",
+    "cssUrl": "inline"
+  },
+  "assets": [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
+}

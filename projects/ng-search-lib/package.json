@@ -1,0 +1,48 @@
+{
+  "name": "@ng-search/core",
+  "version": "0.1.0",
+  "description": "A modern, performant, and extensible Angular 20+ library for building search applications with signals, SSR support, and plugin-based architecture",
+  "keywords": [
+    "angular",
+    "angular20",
+    "search",
+    "facets",
+    "autocomplete",
+    "suggestions",
+    "search-ui",
+    "angular-signals",
+    "ssr",
+    "search-components",
+    "elasticsearch",
+    "opensearch",
+    "algolia",
+    "standalone-components",
+    "zone-less"
+  ],
+  "author": "",
+  "license": "MIT",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "peerDependencies": {
+    "@angular/common": "^19.2.0 || ^20.0.0",
+    "@angular/core": "^19.2.0 || ^20.0.0",
+    "@angular/platform-browser": "^19.2.0 || ^20.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "main": "./bundles/ng-search-core.umd.js",
+  "module": "./fesm2022/ng-search-core.mjs",
+  "typings": "./index.d.ts"
+}
