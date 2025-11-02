@@ -10,9 +10,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "ng-search-lib": [
-        "./dist/ng-search-lib"
-      ]
+      "ng-search-lib": ["./dist/ng-search-lib"],
+      "@chesnokovtony/ng-search": ["./projects/ng-search-lib/src/public-api.ts"],
+      "@chesnokovtony/ng-search/*": ["./projects/ng-search-lib/src/*"]
     },
     "skipLibCheck": true,
     "isolatedModules": true,

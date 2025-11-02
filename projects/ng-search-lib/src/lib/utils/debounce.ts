@@ -9,9 +9,7 @@ import { debounce, distinctUntilChanged } from 'rxjs/operators';
 /**
  * Debounce operator with configurable time
  */
-export function debounceSearch<T>(
-  dueTime: number
-): MonoTypeOperatorFunction<T> {
+export function debounceSearch<T>(dueTime: number): MonoTypeOperatorFunction<T> {
   return (source: Observable<T>) =>
     source.pipe(
       distinctUntilChanged(),
@@ -30,6 +28,7 @@ export function debounceFunction<T extends (...args: any[]) => any>(
   let timeoutId: number | undefined;
 
   return function (this: any, ...args: Parameters<T>) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const context = this;
 
     if (timeoutId !== undefined) {
@@ -54,6 +53,7 @@ export function throttleFunction<T extends (...args: any[]) => any>(
   let lastRan: number | undefined;
 
   return function (this: any, ...args: Parameters<T>) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const context = this;
 
     if (!lastRan) {
@@ -64,12 +64,15 @@ export function throttleFunction<T extends (...args: any[]) => any>(
         clearTimeout(timeoutId);
       }
 
-      timeoutId = window.setTimeout(() => {
-        if (Date.now() - lastRan! >= wait) {
-          func.apply(context, args);
-          lastRan = Date.now();
-        }
-      }, wait - (Date.now() - lastRan));
+      timeoutId = window.setTimeout(
+        () => {
+          if (Date.now() - lastRan! >= wait) {
+            func.apply(context, args);
+            lastRan = Date.now();
+          }
+        },
+        wait - (Date.now() - lastRan)
+      );
     }
   };
 }

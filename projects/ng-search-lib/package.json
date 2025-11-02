@@ -1,33 +1,28 @@
 {
-  "name": "@ng-search/core",
-  "version": "0.1.0",
+  "name": "@chesnokovtony/ng-search",
+  "version": "0.1.3",
   "description": "A modern, performant, and extensible Angular 20+ library for building search applications with signals, SSR support, and plugin-based architecture",
   "keywords": [
     "angular",
-    "angular20",
     "search",
-    "facets",
-    "autocomplete",
-    "suggestions",
     "search-ui",
+    "autocomplete",
+    "facets",
+    "faceted-search",
+    "typeahead",
+    "search-box",
     "angular-signals",
-    "ssr",
-    "search-components",
-    "elasticsearch",
-    "opensearch",
-    "algolia",
-    "standalone-components",
-    "zone-less"
+    "standalone"
   ],
-  "author": "",
+  "author": "Anton Chesnokov <chesnokov.tony@gmail.com>",
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/AntonChesnokov/ng-search#readme",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/AntonChesnokov/ng-search.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/AntonChesnokov/ng-search/issues"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -44,5 +39,6 @@
   "sideEffects": false,
   "main": "./bundles/ng-search-core.umd.js",
   "module": "./fesm2022/ng-search-core.mjs",
-  "typings": "./index.d.ts"
+  "typings": "./index.d.ts",
+  "style": "./styles/index.css"
 }

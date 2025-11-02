@@ -41,10 +41,7 @@ export function isNavigationKey(key: string): boolean {
  * Check if key is action key
  */
 export function isActionKey(key: string): boolean {
-  return [
-    KeyboardKey.Enter,
-    KeyboardKey.Space,
-  ].includes(key as KeyboardKey);
+  return [KeyboardKey.Enter, KeyboardKey.Space].includes(key as KeyboardKey);
 }
 
 /**
@@ -60,9 +57,7 @@ export class KeyboardNavigationHandler {
    * Update items list
    */
   updateItems(selector: string): void {
-    this.items = Array.from(
-      this.container.querySelectorAll<HTMLElement>(selector)
-    );
+    this.items = Array.from(this.container.querySelectorAll<HTMLElement>(selector));
   }
 
   /**
@@ -124,9 +119,7 @@ export class KeyboardNavigationHandler {
   movePrevious(): void {
     if (this.items.length === 0) return;
 
-    this.currentIndex = this.currentIndex <= 0
-      ? this.items.length - 1
-      : this.currentIndex - 1;
+    this.currentIndex = this.currentIndex <= 0 ? this.items.length - 1 : this.currentIndex - 1;
     this.focusCurrent();
   }
 

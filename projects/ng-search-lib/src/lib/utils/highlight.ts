@@ -19,11 +19,7 @@ export interface HighlightOptions {
 /**
  * Highlight text matches in a string
  */
-export function highlightText(
-  text: string,
-  query: string,
-  options: HighlightOptions = {}
-): string {
+export function highlightText(text: string, query: string, options: HighlightOptions = {}): string {
   if (!text || !query) {
     return text;
   }
@@ -43,7 +39,7 @@ export function highlightText(
   const regex = new RegExp(escapedQuery, flags);
 
   // Replace matches
-  return text.replace(regex, match => `${preTag}${match}${postTag}`);
+  return text.replace(regex, (match) => `${preTag}${match}${postTag}`);
 }
 
 /**
@@ -59,7 +55,7 @@ export function highlightTerms(
   }
 
   let result = text;
-  terms.forEach(term => {
+  terms.forEach((term) => {
     result = highlightText(result, term, options);
   });
 

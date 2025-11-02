@@ -1,0 +1,163 @@
+<div class="demo-container">
+  <header class="demo-header">
+    <nav class="header-nav">
+      <a routerLink="/" class="nav-link">🏠 Angular Guides</a>
+      <a routerLink="/rick-morty" class="nav-link">🛸 Rick & Morty</a>
+      <a routerLink="/countries" class="nav-link">🌍 World Atlas</a>
+    </nav>
+    <h1>📚 Angular Guides Demo</h1>
+    <p>Search through Angular tutorials and guides</p>
+  </header>
+
+  <section class="search-area">
+    <div class="search-box-wrapper">
+      <ng-search-box
+        [value]="inputValue()"
+        placeholder="Search tutorials, guides, and more..."
+        [debounceTime]="300"
+        [minQueryLength]="2"
+        [showClearButton]="true"
+        [disableAutoSearch]="true"
+        ariaLabel="Search Angular tutorials"
+        (queryChange)="onQueryChange($event)"
+        (search)="onSearch($event)"
+      >
+        <div searchActions class="custom-actions">
+          <button
+            type="button"
+            class="search-btn"
+            [disabled]="!inputValue()"
+            (click)="searchProvider.executeSearch()"
+          >
+            🔍 Search
+          </button>
+        </div>
+      </ng-search-box>
+
+      <ng-search-suggestions
+        [maxSuggestions]="8"
+        [autoHighlightFirst]="true"
+        [showNoResults]="false"
+        (suggestionSelected)="onSuggestionSelected($event)"
+      >
+        <ng-template
+          #suggestionTemplate
+          let-suggestion
+          let-index="index"
+          let-highlighted="highlighted"
+        >
+          <div class="custom-suggestion" [class.active]="highlighted">
+            <div class="suggestion-icon">
+              @if (suggestion.metadata?.type === 'tutorial') {
+                📚
+              } @else if (suggestion.metadata?.type === 'guide') {
+                📖
+              } @else {
+                🔍
+              }
+            </div>
+            <div class="suggestion-content">
+              <div class="suggestion-title">{{ suggestion.text }}</div>
+              @if (suggestion.metadata?.category) {
+                <div class="suggestion-meta">{{ suggestion.metadata.category }}</div>
+              }
+            </div>
+            @if (suggestion.count !== undefined) {
+              <span class="suggestion-badge">{{ suggestion.count }}</span>
+            }
+          </div>
+        </ng-template>
+      </ng-search-suggestions>
+    </div>
+  </section>
+
+  <div class="search-layout">
+    <aside class="filters-column">
+      <div class="filters-card">
+        <ng-applied-filters
+          [filters]="searchProvider.appliedFilters()"
+          [fieldLabels]="facetLabels"
+          (clearAll)="onClearAllFilters()"
+          (removeFilter)="onRemoveFilter($event)"
+        />
+
+        <ng-facets-container
+          [facets]="searchProvider.facets()"
+          [title]="'Filter tutorials'"
+          (facetChange)="onFacetChange($event)"
+          (clearAll)="onClearAllFilters()"
+          (toggleCollapse)="searchProvider.toggleFacetCollapsed($event)"
+        />
+      </div>
+    </aside>
+
+    <main class="results-column">
+      <ng-search-results
+        [pageSize]="5"
+        [showPagination]="true"
+        [enableVirtualScroll]="false"
+        [highlightQuery]="true"
+        (pageChange)="onPageChange($event)"
+        emptyMessage="No tutorials found. Try a different search term."
+      >
+        <ng-template #resultTemplate let-result let-index="index" let-query="query">
+          <div class="custom-result">
+            <div class="result-badge">{{ index + 1 }}</div>
+            <div class="result-content">
+              <h3 class="result-title">
+                @if (result.data.url) {
+                  <a
+                    [href]="result.data.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="result-link"
+                  >
+                    {{ result.data.title }}
+                    <svg
+                      class="external-link-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
+                } @else {
+                  {{ result.data.title }}
+                }
+                @if (result.data.category) {
+                  <span class="result-category">{{ result.data.category }}</span>
+                }
+              </h3>
+              <p class="result-description">{{ result.data.description }}</p>
+              <div class="result-footer">
+                @if (result.data.difficulty) {
+                  <span class="difficulty-badge" [attr.data-level]="result.data.difficulty">
+                    {{ result.data.difficulty }}
+                  </span>
+                }
+                @if (result.data.tags && result.data.tags.length > 0) {
+                  <div class="result-tags">
+                    @for (tag of result.data.tags; track tag) {
+                      <span class="tag">{{ tag }}</span>
+                    }
+                  </div>
+                }
+                @if (result.score !== undefined) {
+                  <span class="result-score">Score: {{ result.score.toFixed(2) }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ng-search-results>
+    </main>
+  </div>
+</div>

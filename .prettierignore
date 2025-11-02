@@ -1,0 +1,17 @@
+# dependencies
+node_modules
+
+# build outputs
+dist
+*.tsbuildinfo
+
+# coverage
+coverage
+
+# misc
+.angular
+.vscode
+.idea
+*.log
+package-lock.json
+yarn.lock

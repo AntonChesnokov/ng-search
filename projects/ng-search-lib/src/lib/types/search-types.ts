@@ -1,5 +1,5 @@
 /**
- * Core search types and interfaces for the @ng-search/core library
+ * Core search types and interfaces for the @chesnokovtony/ng-search library
  */
 
 /**
@@ -82,7 +82,7 @@ export interface SearchResponse<T = any> {
  */
 export interface AggregationResult {
   /** Type of aggregation */
-  type: 'terms' | 'range' | 'histogram' | 'stats' | 'custom';
+  type: 'terms' | 'range' | 'histogram' | 'stats' | 'custom' | string;
   /** Aggregation buckets */
   buckets?: AggregationBucket[];
   /** Statistical values (for stats aggregation) */
@@ -185,6 +185,8 @@ export interface SearchConfig {
   enableHighlighting?: boolean;
   /** Highlight fields */
   highlightFields?: string[];
+  /** Maximum number of telemetry events to keep in memory */
+  eventHistoryLimit?: number | null;
 }
 
 /**
@@ -200,7 +202,11 @@ export type SearchEventType =
   | 'filter_cleared'
   | 'page_changed'
   | 'result_clicked'
-  | 'suggestion_selected';
+  | 'suggestion_selected'
+  | 'suggestions_requested'
+  | 'suggestions_received'
+  | 'suggestions_cleared'
+  | 'suggestions_failed';
 
 /**
  * Search event

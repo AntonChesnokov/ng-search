@@ -1,9 +1,9 @@
 /**
  * Library version
  */
-export const LIB_VERSION = '0.1.0';
+export const LIB_VERSION = '0.1.3';
 
 /**
  * Library name
  */
-export const LIB_NAME = '@ng-search/core';
+export const LIB_NAME = '@chesnokovtony/ng-search';

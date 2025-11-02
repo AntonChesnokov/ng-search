@@ -1,0 +1,21 @@
+@layer ng-search.reset, ng-search.tokens, ng-search.theme, ng-search.utilities, ng-search.components;
+
+@import './_reset.css' layer(ng-search.reset);
+@import './_tokens.css' layer(ng-search.tokens);
+@import './_themes.css' layer(ng-search.theme);
+@import './utilities/typography.css' layer(ng-search.utilities);
+@import './utilities/spacing.css' layer(ng-search.utilities);
+@import './utilities/layout.css' layer(ng-search.utilities);
+@import './utilities/accessibility.css' layer(ng-search.utilities);
+
+@import './components/search-box.css' layer(ng-search.components);
+@import './components/suggestions.css' layer(ng-search.components);
+@import './components/results.css' layer(ng-search.components);
+@import './components/facets/facets-container.css' layer(ng-search.components);
+@import './components/facets/facet-wrapper.css' layer(ng-search.components);
+@import './components/facets/facet-base.css' layer(ng-search.components);
+@import './components/facets/applied-filters.css' layer(ng-search.components);
+@import './components/facets/built-in/text-facet.css' layer(ng-search.components);
+@import './components/facets/built-in/text-typeahead-facet.css' layer(ng-search.components);
+@import './components/facets/built-in/number-facet.css' layer(ng-search.components);
+@import './components/facets/built-in/number-range-facet.css' layer(ng-search.components);

@@ -1,0 +1,25 @@
+@layer ng-search.utilities {
+  :where(.ng-typography-body) {
+    font-family: var(--ng-font-family-base, system-ui);
+    font-size: var(--ng-font-size-md, 1rem);
+    line-height: var(--ng-line-height-normal, 1.5);
+    color: var(--ng-color-text-primary, #0f172a);
+  }
+
+  :where(.ng-typography-muted) {
+    color: var(--ng-color-text-muted, #64748b);
+  }
+
+  :where(.ng-heading-sm) {
+    font-size: var(--ng-font-size-lg, 1.25rem);
+    font-weight: var(--ng-font-weight-semibold, 600);
+    line-height: var(--ng-line-height-tight, 1.25);
+  }
+
+  :where(.ng-text-mono) {
+    font-family: var(--ng-font-family-mono, monospace);
+    font-feature-settings:
+      'calt' 1,
+      'ss02' 1;
+  }
+}

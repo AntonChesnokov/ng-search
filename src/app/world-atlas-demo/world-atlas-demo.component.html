@@ -1,0 +1,151 @@
+<div class="atlas-shell">
+  <header class="atlas-header">
+    <nav class="demo-nav">
+      <a routerLink="/" class="nav-link">🏠 Angular Guides</a>
+      <a routerLink="/rick-morty" class="nav-link">🛸 Rick & Morty</a>
+      <a routerLink="/countries" class="nav-link active">🌍 World Atlas</a>
+    </nav>
+
+    <h1>World Atlas Knowledge Graph</h1>
+    <p>
+      Explore countries, regions and time zones in a single search experience powered by the REST
+      Countries API.
+    </p>
+  </header>
+
+  <section class="search-panel">
+    <div class="search-box-wrapper">
+      <ng-search-box
+        [value]="inputValue()"
+        placeholder="Search countries, capitals or native names..."
+        [debounceTime]="250"
+        [minQueryLength]="1"
+        [showClearButton]="true"
+        ariaLabel="Search countries"
+        (queryChange)="onQueryChange($event)"
+        (search)="onSearch($event)"
+      >
+        <div searchActions class="custom-actions">
+          <button type="button" class="search-btn" (click)="searchProvider.executeSearch()">
+            Refresh results
+          </button>
+        </div>
+      </ng-search-box>
+
+      <ng-search-suggestions
+        [maxSuggestions]="8"
+        (suggestionSelected)="onSuggestionSelected($event)"
+      >
+        <ng-template #suggestionTemplate let-suggestion let-highlighted="highlighted">
+          <div class="suggestion" [class.active]="highlighted">
+            @if (suggestion.metadata?.flag; as flagUrl) {
+              <div class="suggestion-flag">
+                <img [src]="flagUrl" alt="" />
+              </div>
+            }
+            <div class="suggestion-body">
+              <div class="suggestion-title">{{ suggestion.text }}</div>
+              @if (suggestion.metadata?.region) {
+                <div class="suggestion-meta">{{ suggestion.metadata.region }}</div>
+              }
+            </div>
+          </div>
+        </ng-template>
+      </ng-search-suggestions>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="layout__filters">
+      <div class="filters-card">
+        <ng-applied-filters
+          [filters]="searchProvider.appliedFilters()"
+          [fieldLabels]="facetLabels"
+          (clearAll)="onClearAllFilters()"
+          (removeFilter)="onRemoveFilter($event)"
+        />
+
+        <ng-facets-container
+          [facets]="searchProvider.facets()"
+          [title]="'Discover by facets'"
+          (facetChange)="onFacetChange($event)"
+          (clearAll)="onClearAllFilters()"
+          (toggleCollapse)="searchProvider.toggleFacetCollapsed($event)"
+        />
+      </div>
+    </aside>
+
+    <main class="layout__results">
+      <ng-search-results
+        [pageSize]="15"
+        [showPagination]="true"
+        [enableVirtualScroll]="false"
+        emptyMessage="No countries match the current filters. Try a different region or name."
+        (pageChange)="onPageChange()"
+      >
+        <ng-template #resultTemplate let-result let-index="index">
+          <article class="country-card">
+            <header class="country-card__header">
+              <div class="country-card__identity">
+                @if (primaryFlag(result.data); as flag) {
+                  <div class="country-card__flag">
+                    <img
+                      [src]="flag"
+                      [alt]="result.data.flags?.alt ?? result.data.name.common + ' flag'"
+                    />
+                  </div>
+                }
+                <div>
+                  <h2>{{ result.data.name.common }}</h2>
+                  <p class="country-card__subtitle">
+                    {{ result.data.name.official }}
+                    @if (result.data.capital?.length) {
+                      <span class="country-card__capital"
+                        >Capital: {{ result.data.capital.join(', ') }}</span
+                      >
+                    }
+                  </p>
+                </div>
+              </div>
+            </header>
+
+            <section class="country-card__stats">
+              <div class="stat-block">
+                <span class="stat-label">Population</span>
+                <span class="stat-value">{{ formatNumber(result.data.population) ?? '—' }}</span>
+              </div>
+              <div class="stat-block">
+                <span class="stat-label">Region</span>
+                <span class="stat-value">{{ result.data.region }}</span>
+              </div>
+              @if (result.data.subregion) {
+                <div class="stat-block">
+                  <span class="stat-label">Sub-region</span>
+                  <span class="stat-value">{{ result.data.subregion }}</span>
+                </div>
+              }
+              <div class="stat-block">
+                <span class="stat-label">Time zones</span>
+                <span class="stat-value">{{ result.data.timezones.slice(0, 3).join(', ') }}</span>
+              </div>
+            </section>
+
+            <section class="country-card__details">
+              @let currencies = listCurrencies(result.data);
+              @if (currencies.length) {
+                <div class="detail-column">
+                  <h3>Currencies</h3>
+                  <ul>
+                    @for (currency of currencies; track currency) {
+                      <li>{{ currency }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </section>
+          </article>
+        </ng-template>
+      </ng-search-results>
+    </main>
+  </div>
+</div>

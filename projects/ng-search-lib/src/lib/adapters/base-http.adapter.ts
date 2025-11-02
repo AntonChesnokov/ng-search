@@ -11,7 +11,7 @@ import {
   SearchAdapter,
   HttpAdapterOptions,
   AdapterConfig,
-  SuggestOptions
+  SuggestOptions,
 } from '../types/adapter-types';
 import { SearchQuery, SearchResponse, Suggestion } from '../types/search-types';
 
@@ -24,10 +24,7 @@ export abstract class BaseHttpAdapter<T = any> implements SearchAdapter<T> {
   protected config: AdapterConfig;
   protected options: HttpAdapterOptions;
 
-  constructor(
-    config: AdapterConfig,
-    options?: HttpAdapterOptions
-  ) {
+  constructor(config: AdapterConfig, options?: HttpAdapterOptions) {
     this.config = config;
     this.options = {
       timeout: options?.timeout ?? 30000,
@@ -66,7 +63,7 @@ export abstract class BaseHttpAdapter<T = any> implements SearchAdapter<T> {
    * Check if adapter is ready
    */
   isReady(): Observable<boolean> {
-    return new Observable(observer => {
+    return new Observable((observer) => {
       observer.next(true);
       observer.complete();
     });
@@ -117,9 +114,7 @@ export abstract class BaseHttpAdapter<T = any> implements SearchAdapter<T> {
    * Execute HTTP request with error handling and retries
    */
   protected executeRequest<R>(request: Observable<R>): Observable<R> {
-    let processedRequest = request.pipe(
-      timeout(this.options.timeout!)
-    );
+    let processedRequest = request.pipe(timeout(this.options.timeout!));
 
     // Apply retry logic
     if (this.options.retry && this.options.retry.maxRetries! > 0) {
@@ -132,11 +127,12 @@ export abstract class BaseHttpAdapter<T = any> implements SearchAdapter<T> {
               throw error;
             }
 
-            const delay = this.options.retry!.backoff === 'exponential'
-              ? this.options.retry!.delay! * Math.pow(2, retryCount - 1)
-              : this.options.retry!.delay!;
+            const delay =
+              this.options.retry!.backoff === 'exponential'
+                ? this.options.retry!.delay! * Math.pow(2, retryCount - 1)
+                : this.options.retry!.delay!;
 
-            return new Observable<void>(observer => {
+            return new Observable<void>((observer) => {
               setTimeout(() => {
                 observer.next(undefined);
                 observer.complete();
@@ -149,7 +145,7 @@ export abstract class BaseHttpAdapter<T = any> implements SearchAdapter<T> {
 
     // Apply error handler
     processedRequest = processedRequest.pipe(
-      catchError(error => {
+      catchError((error) => {
         if (this.options.errorHandler) {
           return this.options.errorHandler(error);
         }
@@ -160,21 +156,22 @@ export abstract class BaseHttpAdapter<T = any> implements SearchAdapter<T> {
     // Apply response interceptor
     if (this.options.responseInterceptor) {
       processedRequest = processedRequest.pipe(
-        catchError(error => throwError(() => error)),
-        (source) => new Observable(observer => {
-          source.subscribe({
-            next: (value) => {
-              try {
-                const intercepted = this.options.responseInterceptor!(value);
-                observer.next(intercepted);
-              } catch (err) {
-                observer.error(err);
-              }
-            },
-            error: (err) => observer.error(err),
-            complete: () => observer.complete(),
-          });
-        })
+        catchError((error) => throwError(() => error)),
+        (source) =>
+          new Observable((observer) => {
+            source.subscribe({
+              next: (value) => {
+                try {
+                  const intercepted = this.options.responseInterceptor!(value);
+                  observer.next(intercepted);
+                } catch (err) {
+                  observer.error(err);
+                }
+              },
+              error: (err) => observer.error(err),
+              complete: () => observer.complete(),
+            });
+          })
       );
     }
 

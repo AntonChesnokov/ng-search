@@ -1,0 +1,64 @@
+@layer ng-search.components {
+  :where(.ng-facet-wrapper) {
+    background: var(--ng-color-bg-elevated, #ffffff);
+    border: 1px solid color-mix(in srgb, var(--ng-color-border, #e2e8f0) 70%, transparent);
+    border-radius: var(--ng-radius-md, 0.5rem);
+    box-shadow: var(--ng-shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.08));
+    overflow: hidden;
+  }
+
+  :where(.ng-facet-toggle) {
+    inline-size: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ng-space-xs, 0.5rem);
+    padding-block: var(--ng-space-sm, 0.75rem);
+    padding-inline: var(--ng-space-md, 1rem);
+    background: color-mix(in srgb, var(--ng-color-bg-surface, #f8fafc) 90%, transparent);
+    border: none;
+    color: var(--ng-color-text-primary, #0f172a);
+    font-size: var(--ng-font-size-sm, 0.875rem);
+    font-weight: var(--ng-font-weight-semibold, 600);
+    cursor: pointer;
+    text-align: start;
+    transition:
+      background-color var(--ng-transition-fast, 150ms ease-in-out),
+      filter var(--ng-transition-fast, 150ms ease-in-out);
+  }
+
+  :where(.ng-facet-toggle:hover) {
+    filter: brightness(0.98);
+  }
+
+  :where(.ng-facet-toggle:focus-visible) {
+    outline: 2px solid var(--ng-color-focus, #1d4ed8);
+    outline-offset: 2px;
+  }
+
+  :where(.ng-facet-toggle-icon) {
+    font-size: var(--ng-font-size-xs, 0.75rem);
+    opacity: 0.7;
+  }
+
+  :where(.ng-facet-badge) {
+    margin-inline-start: auto;
+    padding-block: var(--ng-space-3xs, 0.125rem);
+    padding-inline: var(--ng-space-xs, 0.5rem);
+    border-radius: 999px;
+    background: var(--ng-color-primary, #2563eb);
+    color: var(--ng-color-primary-contrast, #f8fafc);
+    font-size: var(--ng-font-size-xs, 0.75rem);
+    font-weight: var(--ng-font-weight-medium, 500);
+  }
+
+  :where(.ng-facet-content) {
+    padding-block: var(--ng-space-sm, 0.75rem);
+    padding-inline: var(--ng-space-md, 1rem);
+    border-block-start: 1px solid
+      color-mix(in srgb, var(--ng-color-border, #e2e8f0) 70%, transparent);
+  }
+
+  :where(.ng-facet-wrapper.ng-facet-collapsed) .ng-facet-content {
+    display: none;
+  }
+}

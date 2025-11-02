@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { SuggestionsComponent } from './suggestions.component';
 import { SearchStateService } from '../../services/search-state.service';
 import { SSRSafeService } from '../../services/ssr-safe.service';
@@ -22,6 +22,7 @@ describe('SuggestionsComponent', () => {
       suggestions: signal(mockSuggestions),
       loadingSuggestions: signal(false),
       query: signal('angular'),
+      markSuggestionSelected: jasmine.createSpy('markSuggestionSelected'),
     };
 
     mockSSRSafe = {
@@ -33,6 +34,7 @@ describe('SuggestionsComponent', () => {
       providers: [
         { provide: SearchStateService, useValue: mockSearchState },
         { provide: SSRSafeService, useValue: mockSSRSafe },
+        provideZonelessChangeDetection(),
       ],
     }).compileComponents();
 
@@ -99,7 +101,7 @@ describe('SuggestionsComponent', () => {
   it('should navigate suggestions with keyboard', () => {
     fixture.componentRef.setInput('autoHighlightFirst', false);
     component.isVisible.set(true);
-    component.highlightedIndex.set(-1); // Reset any auto-highlighting
+    component.highlightedIndex.set(-1);
     fixture.detectChanges();
 
     // Initially no highlight

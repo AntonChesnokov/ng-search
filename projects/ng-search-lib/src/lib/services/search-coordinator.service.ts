@@ -6,11 +6,13 @@
  */
 
 import { Injectable, signal, effect, Signal, DestroyRef, inject } from '@angular/core';
-import { Subject, Subscription, timer, switchMap, catchError, of, finalize } from 'rxjs';
+import { Subject, Subscription, timer, switchMap, catchError, of, finalize, map } from 'rxjs';
 import { SearchAdapter } from '../types/adapter-types';
-import { SearchQuery, SearchResponse, Suggestion } from '../types/search-types';
+import { SearchQuery, SearchResponse } from '../types/search-types';
 import { SearchStateService } from './search-state.service';
 import { SearchConfigModel } from '../models/search-config.model';
+import { SearchTelemetryService } from './search-telemetry.service';
+import { DEFAULT_SEARCH_LOGGER, NG_SEARCH_LOGGER } from './search-logger';
 
 /**
  * Search coordinator service
@@ -18,234 +20,319 @@ import { SearchConfigModel } from '../models/search-config.model';
  */
 @Injectable()
 export class SearchCoordinatorService<T = any> {
-	private readonly destroyRef = inject(DestroyRef);
-	private readonly searchState = inject(SearchStateService<T>);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly searchState = inject(SearchStateService<T>);
+  private readonly telemetry = inject(SearchTelemetryService, { optional: true });
+  private readonly logger = inject(NG_SEARCH_LOGGER, { optional: true }) ?? DEFAULT_SEARCH_LOGGER;
 
-	// Search trigger subjects
-	private readonly searchTrigger$ = new Subject<SearchQuery>();
-	private readonly suggestTrigger$ = new Subject<string>();
+  // Search trigger subjects
+  private readonly searchTrigger$ = new Subject<SearchQuery>();
+  private readonly suggestTrigger$ = new Subject<string>();
 
-	// Subscriptions
-	private searchSubscription?: Subscription;
-	private suggestSubscription?: Subscription;
+  // Subscriptions
+  private searchSubscription?: Subscription;
+  private suggestSubscription?: Subscription;
 
-	// Configuration
-	private readonly _config = signal<SearchConfigModel>(new SearchConfigModel());
-	readonly config: Signal<SearchConfigModel> = this._config.asReadonly();
+  // Configuration
+  private readonly _config = signal<SearchConfigModel>(new SearchConfigModel());
+  readonly config: Signal<SearchConfigModel> = this._config.asReadonly();
 
-	// Adapter
-	private _adapter?: SearchAdapter<T>;
+  // Adapter
+  private _adapter?: SearchAdapter<T>;
 
-	constructor() {
-		console.log('[SearchCoordinator] Initialized');
-		this.setupAutoSearch();
-		// Note: setupAutoSuggest() is called in setAdapter() after adapter is set
-		this.setupCleanup();
-	}
+  private currentSearchMeta: { query: SearchQuery; startedAt: number } | null = null;
+  private currentSuggestMeta: { query: string; startedAt: number } | null = null;
+  private lastAutoSearchSignature: string | null = null;
 
-	/**
-	 * Set search adapter
-	 */
-	setAdapter(adapter: SearchAdapter<T>): void {
-		console.log('[SearchCoordinator] setAdapter() called with:', adapter);
-		this._adapter = adapter;
+  constructor() {
+    this.setupAutoSearch();
+    // Note: setupAutoSuggest() is called in setAdapter() after adapter is set
+    this.setupCleanup();
+    this.setupConfigSync();
+  }
 
-		// Setup auto-suggest after adapter is set
-		this.setupAutoSuggest();
-	}
+  /**
+   * Set search adapter
+   */
+  setAdapter(adapter: SearchAdapter<T>): void {
+    this._adapter = adapter;
 
-	/**
-	 * Set configuration
-	 */
-	setConfig(config: Partial<SearchConfigModel>): void {
-		this._config.update((current) => current.merge(config));
-	}
+    // Setup auto-suggest after adapter is set
+    this.suggestSubscription?.unsubscribe();
+    this.setupAutoSuggest();
+  }
 
-	/**
-	 * Execute search manually
-	 */
-	search(query?: SearchQuery): void {
-		console.log('[SearchCoordinator] search() called with query:', query);
-		console.log('[SearchCoordinator] adapter:', this._adapter);
+  /**
+   * Set configuration
+   */
+  setConfig(config: Partial<SearchConfigModel>): void {
+    this._config.update((current) => current.merge(config));
+  }
 
-		if (!this._adapter) {
-			console.error('[SearchCoordinator] Search adapter is not configured');
-			return;
-		}
+  /**
+   * Execute search manually
+   */
+  search(query?: SearchQuery): void {
+    if (!this._adapter) {
+      this.logger.error('[SearchCoordinator] Search adapter is not configured');
+      return;
+    }
 
-		const searchQuery = query ?? this.searchState.searchQuery();
-		console.log('[SearchCoordinator] searchQuery:', searchQuery);
+    const searchQuery = query ?? this.searchState.searchQuery();
 
-		// For demo purposes, allow empty queries to show all results
-		// Validate minimum query length only if query is not empty
-		if (
-			searchQuery.query.trim().length > 0 &&
-			searchQuery.query.trim().length < this._config().minQueryLength
-		) {
-			console.log('[SearchCoordinator] Query too short, skipping search');
-			return;
-		}
+    // Validate minimum query length only if query is not empty
+    if (
+      searchQuery.query.trim().length > 0 &&
+      searchQuery.query.trim().length < this._config().minQueryLength
+    ) {
+      return;
+    }
 
-		console.log('[SearchCoordinator] Triggering search via searchTrigger$');
-		this.searchTrigger$.next(searchQuery);
-	}	/**
-	 * Request suggestions
-	 */
-	suggest(query: string): void {
-		console.log('[SearchCoordinator] suggest() called with query:', query);
-		console.log('[SearchCoordinator] adapter.suggest exists:', !!this._adapter?.suggest);
+    this.searchTrigger$.next(searchQuery);
+  }
 
-		if (!this._adapter?.suggest) {
-			console.log('[SearchCoordinator] No suggest method on adapter');
-			return;
-		}
+  /**
+   * Request suggestions
+   */
+  suggest(query: string): void {
+    if (!this._adapter?.suggest) {
+      return;
+    }
 
-		if (query.trim().length < this._config().minQueryLength) {
-			console.log('[SearchCoordinator] Query too short for suggestions, clearing');
-			this.searchState.clearSuggestions();
-			return;
-		}
+    if (query.trim().length < this._config().minQueryLength) {
+      this.searchState.clearSuggestions();
+      return;
+    }
 
-		console.log('[SearchCoordinator] Triggering suggestTrigger$');
-		this.suggestTrigger$.next(query);
-	}
+    this.suggestTrigger$.next(query);
+  }
 
-	/**
-	 * Cancel ongoing search
-	 */
-	cancel(): void {
-		this.searchSubscription?.unsubscribe();
-		this.searchState.setLoading(false);
-	}
+  /**
+   * Cancel ongoing search
+   */
+  cancel(): void {
+    this.searchSubscription?.unsubscribe();
+    this.searchState.setLoading(false);
+  }
 
-	/**
-	 * Setup automatic search on query changes
-	 */
-	private setupAutoSearch(): void {
-		console.log('[SearchCoordinator] setupAutoSearch()');
+  /**
+   * Setup automatic search on query changes
+   */
+  private setupAutoSearch(): void {
+    this.searchSubscription = this.searchTrigger$
+      .pipe(
+        switchMap((query) => {
+          this.currentSearchMeta = { query, startedAt: Date.now() };
+          this.searchState.markSearchStarted(query);
+          this.searchState.setLoading(true);
 
-		// Subscribe to search trigger with debouncing
-		this.searchSubscription = this.searchTrigger$
-			.pipe(
-				switchMap((query) => {
-					console.log('[SearchCoordinator] searchTrigger$ fired with query:', query);
-					this.searchState.setLoading(true);
+          return timer(this._config().debounceTime).pipe(
+            switchMap(() => {
+              if (!this._adapter) {
+                return of(null);
+              }
+              const startedAt = this.currentSearchMeta?.startedAt ?? Date.now();
+              return this._adapter.search(query).pipe(
+                map((response) => ({ response, query, startedAt })),
+                catchError((error) => {
+                  this.searchState.setError(error);
+                  this.searchState.markSearchFailed(error, query);
+                  this.telemetry?.recordError({
+                    error,
+                    source: 'search',
+                    context: {
+                      query: query.query,
+                      filters: query.filters?.length ?? 0,
+                    },
+                  });
+                  return of({ response: null, query, startedAt });
+                }),
+                finalize(() => {
+                  this.searchState.setLoading(false);
+                  this.currentSearchMeta = null;
+                })
+              );
+            })
+          );
+        })
+      )
+      .subscribe((payload) => {
+        if (!payload?.response) {
+          return;
+        }
 
-					return timer(this._config().debounceTime).pipe(
-						switchMap(() => {
-							console.log('[SearchCoordinator] Executing adapter.search()');
-							if (!this._adapter) {
-								return of(null);
-							}
-							return this._adapter.search(query).pipe(
-								catchError((error) => {
-									this.searchState.setError(error);
-									return of(null);
-								}),
-								finalize(() => {
-									console.log('[SearchCoordinator] Search completed, setting loading to false');
-									this.searchState.setLoading(false);
-								})
-							);
-						})
-					);
-				})
-			)
-			.subscribe((response) => {
-				console.log('[SearchCoordinator] Search response received:', response);
-				if (response) {
-					this.handleSearchResponse(response);
-				}
-			});
+        const { response, query, startedAt } = payload;
+        this.handleSearchResponse(response);
 
-		// Setup effect to trigger search on state changes
-		effect(() => {
-			const query = this.searchState.searchQuery();
-			console.log('[SearchCoordinator] effect triggered with query:', query);
+        const duration = response.took ?? Date.now() - startedAt;
+        this.searchState.markSearchCompleted({ query, total: response.total, took: duration });
 
-			// Only auto-search if enabled in config
-			if (!this._config().autoSearch) {
-				console.log('[SearchCoordinator] autoSearch is disabled, skipping automatic search');
-				return;
-			}
+        if (duration !== undefined) {
+          this.telemetry?.recordTiming({
+            name: 'search',
+            duration,
+            metadata: {
+              query: query.query,
+              total: response.total,
+              filters: query.filters?.length ?? 0,
+            },
+          });
+        }
+      });
 
-			// Trigger search if we have a query, filters, or if adapter supports empty searches
-			// For demo purposes, always trigger search to show initial results
-			if (query.query.trim().length > 0 || (query.filters && query.filters.length > 0) || true) {
-				console.log('[SearchCoordinator] Calling search() from effect');
-				this.search(query);
-			}
-		});
-	}
+    effect(() => {
+      const query = this.searchState.searchQuery();
 
-	/**
-	 * Setup automatic suggestions on query changes
-	 */
-	private setupAutoSuggest(): void {
-		console.log('[SearchCoordinator] setupAutoSuggest()');
-		console.log('[SearchCoordinator] adapter.suggest:', this._adapter?.suggest);
+      if (!this._config().autoSearch) {
+        this.lastAutoSearchSignature = null;
+        return;
+      }
 
-		if (!this._adapter?.suggest) {
-			console.log('[SearchCoordinator] No suggest method, skipping auto-suggest setup');
-			return;
-		}
+      const signature = this.serializeQuery(query);
+      const hasQuery = query.query.trim().length >= this._config().minQueryLength;
+      const hasFilters = (query.filters?.length ?? 0) > 0;
 
-		this.suggestSubscription = this.suggestTrigger$
-			.pipe(
-				switchMap((query) => {
-					console.log('[SearchCoordinator] suggestTrigger$ fired with query:', query);
-					return timer(this._config().debounceTime).pipe(
-						switchMap(() => {
-							console.log('[SearchCoordinator] Executing adapter.suggest()');
-							if (!this._adapter?.suggest) {
-								return of([]);
-							}
-							return this._adapter.suggest(query, {
-								maxSuggestions: 10,
-								fuzzy: true,
-							}).pipe(
-								catchError((error) => {
-									console.error('[SearchCoordinator] Suggestion error:', error);
-									return of([]);
-								})
-							);
-						})
-					);
-				})
-			)
-			.subscribe((suggestions) => {
-				console.log('[SearchCoordinator] Suggestions received:', suggestions);
-				this.searchState.setSuggestions(suggestions);
-			});
-	}
+      if (!hasQuery && !hasFilters) {
+        this.lastAutoSearchSignature = null;
+        return;
+      }
 
-	/**
-	 * Handle search response
-	 */
-	private handleSearchResponse(response: SearchResponse<T>): void {
-		this.searchState.setResults(response.results, response.total);
+      if (signature === this.lastAutoSearchSignature) {
+        return;
+      }
 
-		if (response.aggregations) {
-			this.searchState.setAggregations(response.aggregations);
-		}
+      this.lastAutoSearchSignature = signature;
+      this.search(query);
+    });
+  }
 
-		if (response.suggestions && response.suggestions.length > 0) {
-			this.searchState.setSuggestions(response.suggestions);
-		}
-	}
+  /**
+   * Setup automatic suggestions on query changes
+   */
+  private setupAutoSuggest(): void {
+    if (!this._adapter?.suggest) {
+      return;
+    }
 
-	/**
-	 * Setup cleanup on destroy
-	 */
-	private setupCleanup(): void {
-		this.destroyRef.onDestroy(() => {
-			this.searchSubscription?.unsubscribe();
-			this.suggestSubscription?.unsubscribe();
-			this.searchTrigger$.complete();
-			this.suggestTrigger$.complete();
+    this.suggestSubscription = this.suggestTrigger$
+      .pipe(
+        switchMap((query) => {
+          this.currentSuggestMeta = { query, startedAt: Date.now() };
+          this.searchState.markSuggestionsRequested(query);
+          this.searchState.setLoadingSuggestions(true);
 
-			// Call adapter cleanup if available
-			this._adapter?.destroy?.();
-		});
-	}
+          return timer(this._config().debounceTime).pipe(
+            switchMap(() => {
+              if (!this._adapter?.suggest) {
+                this.searchState.setLoadingSuggestions(false);
+                this.currentSuggestMeta = null;
+                return of({ suggestions: [], query, startedAt: Date.now() });
+              }
+
+              const startedAt = this.currentSuggestMeta?.startedAt ?? Date.now();
+              return this._adapter
+                .suggest(query, {
+                  maxSuggestions: 10,
+                  fuzzy: true,
+                })
+                .pipe(
+                  map((suggestions) => ({ suggestions, query, startedAt })),
+                  catchError((error) => {
+                    this.logger.error('[SearchCoordinator] Suggestion error:', error);
+                    this.searchState.markSuggestionsFailed(error, query);
+                    this.telemetry?.recordError({
+                      error,
+                      source: 'suggestions',
+                      context: { query },
+                    });
+                    return of({ suggestions: [], query, startedAt });
+                  }),
+                  finalize(() => {
+                    this.searchState.setLoadingSuggestions(false);
+                    this.currentSuggestMeta = null;
+                  })
+                );
+            })
+          );
+        })
+      )
+      .subscribe((payload) => {
+        if (!payload) {
+          return;
+        }
+
+        const { suggestions, query, startedAt } = payload;
+        this.searchState.setSuggestions(suggestions);
+
+        if (suggestions.length > 0) {
+          const duration = Date.now() - startedAt;
+          this.telemetry?.recordTiming({
+            name: 'suggestions',
+            duration,
+            metadata: {
+              query,
+              count: suggestions.length,
+            },
+          });
+        }
+      });
+  }
+
+  /**
+   * Handle search response
+   */
+  private handleSearchResponse(response: SearchResponse<T>): void {
+    this.searchState.setResults(response.results, response.total);
+
+    if (response.aggregations) {
+      this.searchState.setAggregations(response.aggregations);
+    }
+
+    if (response.suggestions && response.suggestions.length > 0) {
+      this.searchState.setSuggestions(response.suggestions);
+    }
+  }
+
+  /**
+   * Setup cleanup on destroy
+   */
+  private setupCleanup(): void {
+    this.destroyRef.onDestroy(() => {
+      this.searchSubscription?.unsubscribe();
+      this.suggestSubscription?.unsubscribe();
+      this.searchTrigger$.complete();
+      this.suggestTrigger$.complete();
+
+      // Call adapter cleanup if available
+      this._adapter?.destroy?.();
+    });
+  }
+
+  private serializeQuery(query: SearchQuery): string {
+    const normalizedFilters = query.filters?.map((filter) => ({
+      field: filter.field,
+      operator: filter.operator,
+      type: filter.type,
+      value: filter.value,
+    }));
+
+    return JSON.stringify({
+      query: query.query,
+      from: query.from,
+      size: query.size,
+      sort: query.sort,
+      filters: normalizedFilters,
+    });
+  }
+
+  private setupConfigSync(): void {
+    effect(() => {
+      const config = this._config();
+      if (config.eventHistoryLimit !== undefined) {
+        this.searchState.setEventHistoryLimit(config.eventHistoryLimit);
+      } else {
+        this.searchState.setEventHistoryLimit();
+      }
+    });
+  }
 }

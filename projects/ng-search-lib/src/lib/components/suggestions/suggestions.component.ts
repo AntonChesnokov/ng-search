@@ -50,6 +50,7 @@ import type { SuggestionContext } from '../../types/component-types';
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./suggestions.component.css'],
   template: `
     @if (isVisible()) {
       <div
@@ -57,8 +58,8 @@ import type { SuggestionContext } from '../../types/component-types';
         [attr.role]="'listbox'"
         [attr.aria-label]="ariaLabel()"
         (keydown)="handleKeydown($event)"
-        #container>
-
+        #container
+      >
         @defer (when shouldRender()) {
           @if (isLoading()) {
             <div class="suggestions-loading" role="status">
@@ -75,19 +76,18 @@ import type { SuggestionContext } from '../../types/component-types';
                   [attr.aria-selected]="highlightedIndex() === $index"
                   [attr.id]="'suggestion-' + $index"
                   (click)="selectSuggestion(suggestion)"
-                  (mouseenter)="highlightIndex($index)">
-
+                  (mouseenter)="highlightIndex($index)"
+                >
                   @if (customTemplate(); as template) {
                     <ng-container
-                      *ngTemplateOutlet="template; context: createContext(suggestion, $index)" />
+                      *ngTemplateOutlet="template; context: createContext(suggestion, $index)"
+                    />
                   } @else {
                     <div class="suggestion-default">
                       @if (showIcon()) {
                         <span class="suggestion-icon" [innerHTML]="searchIcon"></span>
                       }
-                      <span
-                        class="suggestion-text"
-                        [innerHTML]="formatSuggestionText(suggestion)">
+                      <span class="suggestion-text" [innerHTML]="formatSuggestionText(suggestion)">
                       </span>
                       @if (suggestion.count !== undefined) {
                         <span class="suggestion-count">{{ suggestion.count }}</span>
@@ -100,10 +100,7 @@ import type { SuggestionContext } from '../../types/component-types';
 
             @if (hasMoreSuggestions()) {
               <div class="suggestions-footer">
-                <button
-                  type="button"
-                  class="show-more-button"
-                  (click)="showAllSuggestions.emit()">
+                <button type="button" class="show-more-button" (click)="showAllSuggestions.emit()">
                   {{ showMoreText() }}
                 </button>
               </div>
@@ -121,133 +118,9 @@ import type { SuggestionContext } from '../../types/component-types';
       </div>
     }
   `,
-  styles: [`
-    .suggestions-container {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      margin-top: 4px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      max-height: 400px;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-
-    .suggestions-loading,
-    .suggestions-empty,
-    .suggestions-placeholder {
-      padding: 16px;
-      text-align: center;
-      color: #666;
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #666;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 8px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      vertical-align: middle;
-    }
-
-    .suggestions-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .suggestion-item {
-      padding: 12px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
-      transition: background-color 0.15s ease;
-    }
-
-    .suggestion-item:last-child {
-      border-bottom: none;
-    }
-
-    .suggestion-item:hover,
-    .suggestion-item.highlighted {
-      background-color: #f5f5f5;
-    }
-
-    .suggestion-default {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .suggestion-icon {
-      flex-shrink: 0;
-      width: 16px;
-      height: 16px;
-      opacity: 0.5;
-    }
-
-    .suggestion-icon :deep(svg) {
-      width: 100%;
-      height: 100%;
-    }
-
-    .suggestion-text {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .suggestion-text :deep(mark) {
-      background-color: #fff3cd;
-      font-weight: 600;
-      padding: 0 2px;
-    }
-
-    .suggestion-count {
-      flex-shrink: 0;
-      font-size: 0.875em;
-      color: #999;
-    }
-
-    .suggestions-footer {
-      padding: 8px;
-      border-top: 1px solid #f0f0f0;
-      text-align: center;
-    }
-
-    .show-more-button {
-      background: none;
-      border: none;
-      color: #0066cc;
-      cursor: pointer;
-      font-size: 0.875em;
-      padding: 4px 8px;
-      transition: color 0.15s ease;
-    }
-
-    .show-more-button:hover {
-      color: #0052a3;
-      text-decoration: underline;
-    }
-  `],
   host: {
-    'class': 'ng-search-suggestions',
-  }
+    class: 'ng-search-suggestions',
+  },
 })
 export class SuggestionsComponent {
   private readonly searchState = inject(SearchStateService, { optional: true });
@@ -378,8 +251,9 @@ export class SuggestionsComponent {
 
             // Don't hide if clicking on the search input
             // Find the search input by checking if target is an input with class containing 'search'
-            const isSearchInput = (target as HTMLElement).classList?.contains('ngs-search-input') ||
-                                  (target as HTMLElement).closest('.ngs-search-box') !== null;
+            const isSearchInput =
+              (target as HTMLElement).classList?.contains('ng-search-input') ||
+              (target as HTMLElement).closest('.ng-search-box') !== null;
 
             if (isSearchInput) {
               return;
@@ -477,6 +351,10 @@ export class SuggestionsComponent {
    */
   selectSuggestion(suggestion: Suggestion): void {
     this.suggestionSelected.emit(suggestion);
+    this.searchState?.markSuggestionSelected(suggestion, {
+      index: this.highlightedIndex(),
+      origin: 'component',
+    });
 
     if (this.closeOnSelect()) {
       this.hideSuggestions();
@@ -490,7 +368,7 @@ export class SuggestionsComponent {
     this.isVisible.set(false);
     this.highlightedIndex.set(-1);
     this.visibilityChange.emit(false);
-    this.manuallyHidden.set(true); // Mark as manually hidden
+    this.manuallyHidden.set(true);
   }
 
   /**
@@ -500,7 +378,7 @@ export class SuggestionsComponent {
     if (this.displayedSuggestions().length > 0 || this.isLoading()) {
       this.isVisible.set(true);
       this.visibilityChange.emit(true);
-      this.manuallyHidden.set(false); // Reset manual hidden flag
+      this.manuallyHidden.set(false);
     }
   }
 

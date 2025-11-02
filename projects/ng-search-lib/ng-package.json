@@ -9,6 +9,11 @@
   "assets": [
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    {
+      "glob": "**/*",
+      "input": "src/lib/styles",
+      "output": "styles"
+    }
   ]
 }

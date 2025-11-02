@@ -1,0 +1,149 @@
+@layer ng-search.components {
+  :where(.ng-search-box) {
+    position: relative;
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ng-space-xs, 0.5rem);
+    color: var(--ng-color-text-primary, #0f172a);
+  }
+
+  :where(.ng-search-box[dir='rtl']) {
+    direction: rtl;
+  }
+
+  :where(.ng-search-input-wrapper) {
+    display: flex;
+    align-items: center;
+    gap: var(--ng-space-xs, 0.5rem);
+    inline-size: 100%;
+  }
+
+  :where(.ng-input-container) {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    contain: layout paint;
+  }
+
+  :where(.ng-search-input) {
+    inline-size: 100%;
+    block-size: var(--ng-search-input-height, 2.75rem);
+    padding-block: var(--ng-space-2xs, 0.25rem);
+    padding-inline: calc(var(--ng-space-lg, 1.5rem) + var(--ng-space-sm, 0.75rem));
+    font: var(--ng-font-weight-regular, 400) var(--ng-font-size-md, 1rem) /
+      var(--ng-line-height-normal, 1.5) var(--ng-font-family-base, system-ui);
+    color: var(--ng-color-text-primary, #0f172a);
+    background: var(--ng-color-bg-elevated, #ffffff);
+    border: 1px solid var(--ng-color-border, #e2e8f0);
+    border-radius: var(--ng-radius-md, 0.5rem);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--ng-color-border, #e2e8f0) 25%, transparent);
+    transition:
+      border-color var(--ng-transition-fast, 150ms ease-in-out),
+      box-shadow var(--ng-transition-fast, 150ms ease-in-out),
+      background-color var(--ng-transition-fast, 150ms ease-in-out);
+  }
+
+  :where(.ng-search-input)::placeholder {
+    color: var(--ng-color-text-muted, #64748b);
+  }
+
+  :where(.ng-search-input):hover:not(:disabled) {
+    border-color: color-mix(
+      in srgb,
+      var(--ng-color-border, #e2e8f0) 60%,
+      var(--ng-color-text-muted, #64748b) 40%
+    );
+  }
+
+  :where(.ng-search-input):focus-visible {
+    border-color: var(--ng-color-focus, #1d4ed8);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ng-color-focus, #1d4ed8) 25%, transparent);
+    outline: none;
+  }
+
+  :where(.ng-search-input:disabled) {
+    background: color-mix(in srgb, var(--ng-color-bg-elevated, #ffffff) 70%, transparent 30%);
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  :where(.ng-search-icon) {
+    position: absolute;
+    inset-inline-start: var(--ng-space-sm, 0.75rem);
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ng-color-text-muted, #64748b);
+    pointer-events: none;
+    z-index: var(--ng-z-base, 1);
+  }
+
+  :where(.ng-clear-button) {
+    position: absolute;
+    inset-inline-end: var(--ng-space-sm, 0.75rem);
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--ng-space-3xs, 0.125rem);
+    inline-size: calc(var(--ng-space-md, 1rem) + var(--ng-space-xs, 0.5rem));
+    block-size: calc(var(--ng-space-md, 1rem) + var(--ng-space-xs, 0.5rem));
+    border: none;
+    border-radius: var(--ng-radius-sm, 0.375rem);
+    background: transparent;
+    color: var(--ng-color-text-muted, #64748b);
+    cursor: pointer;
+    transition:
+      background-color var(--ng-transition-fast, 150ms ease-in-out),
+      color var(--ng-transition-fast, 150ms ease-in-out);
+  }
+
+  :where(.ng-clear-button:hover) {
+    background: color-mix(in srgb, var(--ng-color-bg-surface, #f8fafc) 75%, transparent);
+    color: var(--ng-color-text-primary, #0f172a);
+  }
+
+  :where(.ng-clear-button:focus-visible) {
+    outline: 2px solid var(--ng-color-focus, #1d4ed8);
+    outline-offset: 2px;
+  }
+
+  :where(.ng-loading-indicator) {
+    position: absolute;
+    inset-inline-end: calc(var(--ng-space-sm, 0.75rem) + var(--ng-space-xs, 0.5rem));
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ng-space-2xs, 0.25rem);
+    color: var(--ng-color-text-muted, #64748b);
+    font-size: var(--ng-font-size-sm, 0.875rem);
+  }
+
+  :where(.ng-spinner) {
+    inline-size: 1rem;
+    block-size: 1rem;
+    border: 2px solid color-mix(in srgb, var(--ng-color-border, #e2e8f0) 65%, transparent);
+    border-inline-start-color: var(--ng-color-primary, #2563eb);
+    border-radius: 50%;
+    animation: ng-spin var(--ng-spinner-speed, 0.8s) linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes ng-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  :where(.ng-search-box.ng-disabled) {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}

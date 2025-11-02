@@ -1,0 +1,46 @@
+@layer ng-search.reset {
+  :where(:root) {
+    color-scheme: light dark;
+  }
+
+  :where(*),
+  :where(*::before),
+  :where(*::after) {
+    box-sizing: border-box;
+  }
+
+  :where(body),
+  :where(h1, h2, h3, h4, h5, h6),
+  :where(p),
+  :where(figure),
+  :where(blockquote),
+  :where(dl),
+  :where(dd) {
+    margin: 0;
+  }
+
+  :where(ul[role='list'], ol[role='list']) {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  :where(body) {
+    min-block-size: 100vh;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :where(img, picture) {
+    max-inline-size: 100%;
+    display: block;
+  }
+
+  :where(button) {
+    font: inherit;
+  }
+
+  :where(:focus-visible) {
+    outline: none;
+  }
+}

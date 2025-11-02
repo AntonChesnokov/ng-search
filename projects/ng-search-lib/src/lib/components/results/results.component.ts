@@ -54,9 +54,9 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./results.component.css'],
   template: `
     <div class="results-container" [attr.role]="'region'" [attr.aria-label]="ariaLabel()">
-
       @if (isLoading()) {
         <div class="results-loading" role="status">
           @if (customLoadingTemplate(); as template) {
@@ -106,7 +106,8 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                     id="sort-select"
                     [value]="currentSortValue()"
                     (change)="onSortChange($event)"
-                    class="sort-select">
+                    class="sort-select"
+                  >
                     @for (option of sortOptions(); track option.value) {
                       <option [value]="option.value">{{ option.label }}</option>
                     }
@@ -122,14 +123,14 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
               class="results-virtual-viewport"
               [style.height.px]="virtualScrollHeight()"
               (scroll)="onVirtualScroll($event)"
-              #viewport>
-              <div
-                class="results-virtual-spacer"
-                [style.height.px]="totalVirtualHeight()">
+              #viewport
+            >
+              <div class="results-virtual-spacer" [style.height.px]="totalVirtualHeight()">
                 <ul
                   class="results-list"
                   [attr.role]="'list'"
-                  [style.transform]="'translateY(' + virtualScrollOffset() + 'px)'">
+                  [style.transform]="'translateY(' + virtualScrollOffset() + 'px)'"
+                >
                   @for (result of visibleResults(); track trackByFn(result, $index)) {
                     <li
                       class="result-item"
@@ -137,9 +138,11 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                       [attr.id]="'result-' + $index"
                       [class.highlighted]="highlightedIndex() === $index"
                       (click)="selectResult(result, $index)"
-                      (mouseenter)="highlightIndex($index)">
+                      (mouseenter)="highlightIndex($index)"
+                    >
                       <ng-container
-                        *ngTemplateOutlet="renderResult; context: createContext(result, $index)" />
+                        *ngTemplateOutlet="renderResult; context: createContext(result, $index)"
+                      />
                     </li>
                   }
                 </ul>
@@ -147,9 +150,7 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
             </div>
           } @else {
             <!-- Standard list rendering -->
-            <ul
-              class="results-list"
-              [attr.role]="'list'">
+            <ul class="results-list" [attr.role]="'list'">
               @for (result of displayedResults(); track trackByFn(result, $index)) {
                 <li
                   class="result-item"
@@ -157,9 +158,11 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                   [attr.id]="'result-' + $index"
                   [class.highlighted]="highlightedIndex() === $index"
                   (click)="selectResult(result, $index)"
-                  (mouseenter)="highlightIndex($index)">
+                  (mouseenter)="highlightIndex($index)"
+                >
                   <ng-container
-                    *ngTemplateOutlet="renderResult; context: createContext(result, $index)" />
+                    *ngTemplateOutlet="renderResult; context: createContext(result, $index)"
+                  />
                 </li>
               }
             </ul>
@@ -173,7 +176,8 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                 class="pagination-button"
                 [disabled]="!hasPreviousPage()"
                 (click)="previousPage()"
-                [attr.aria-label]="'Previous page'">
+                [attr.aria-label]="'Previous page'"
+              >
                 ‹
               </button>
 
@@ -187,7 +191,8 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                     [class.active]="page === currentPage()"
                     (click)="goToPage(page)"
                     [attr.aria-label]="'Page ' + page"
-                    [attr.aria-current]="page === currentPage() ? 'page' : null">
+                    [attr.aria-current]="page === currentPage() ? 'page' : null"
+                  >
                     {{ page }}
                   </button>
                 }
@@ -198,7 +203,8 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                 class="pagination-button"
                 [disabled]="!hasNextPage()"
                 (click)="nextPage()"
-                [attr.aria-label]="'Next page'">
+                [attr.aria-label]="'Next page'"
+              >
                 ›
               </button>
 
@@ -207,7 +213,8 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
                   class="page-size-select"
                   [value]="pageSize()"
                   (change)="onPageSizeChange($event)"
-                  [attr.aria-label]="'Items per page'">
+                  [attr.aria-label]="'Items per page'"
+                >
                   @for (size of pageSizeOptions(); track size) {
                     <option [value]="size">{{ size }} per page</option>
                   }
@@ -226,14 +233,19 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
     <!-- Template for rendering individual results -->
     <ng-template #renderResult let-result let-index="index" let-total="total" let-query="query">
       @if (customResultTemplate(); as template) {
-        <ng-container *ngTemplateOutlet="template; context: { $implicit: result, index, total, query }" />
+        <ng-container
+          *ngTemplateOutlet="template; context: { $implicit: result, index, total, query }"
+        />
       } @else {
         <div class="result-default">
           <div class="result-title">
             <span [innerHTML]="highlightText(result.data?.title || 'Untitled', query)"></span>
           </div>
           @if (result.data?.description) {
-            <p class="result-description" [innerHTML]="highlightText(result.data.description, query)"></p>
+            <p
+              class="result-description"
+              [innerHTML]="highlightText(result.data.description, query)"
+            ></p>
           }
           @if (result.score !== undefined && showScore()) {
             <div class="result-score">Score: {{ result.score.toFixed(2) }}</div>
@@ -251,235 +263,9 @@ import type { ResultContext, ResultRenderer } from '../../types/component-types'
       }
     </ng-template>
   `,
-  styles: [`
-    .results-container {
-      width: 100%;
-    }
-
-    .results-loading,
-    .results-error,
-    .results-empty,
-    .results-placeholder {
-      padding: 48px 24px;
-      text-align: center;
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #666;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      color: #666;
-      margin: 0;
-    }
-
-    .error-icon,
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    .error-title,
-    .empty-title {
-      margin: 0 0 8px;
-      font-size: 1.25em;
-      font-weight: 600;
-    }
-
-    .error-message,
-    .empty-message {
-      margin: 0 0 16px;
-      color: #666;
-    }
-
-    .retry-button {
-      padding: 8px 24px;
-      background-color: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background-color 0.2s;
-    }
-
-    .retry-button:hover {
-      background-color: #0052a3;
-    }
-
-    .results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid #e0e0e0;
-      margin-bottom: 16px;
-    }
-
-    .results-count {
-      font-size: 0.875em;
-      color: #666;
-    }
-
-    .results-sort {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .results-sort label {
-      font-size: 0.875em;
-      color: #666;
-    }
-
-    .sort-select,
-    .page-size-select {
-      padding: 4px 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 0.875em;
-      cursor: pointer;
-    }
-
-    .results-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .result-item {
-      padding: 16px;
-      border-bottom: 1px solid #f0f0f0;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
-    }
-
-    .result-item:hover,
-    .result-item.highlighted {
-      background-color: #f5f5f5;
-    }
-
-    .result-item:last-child {
-      border-bottom: none;
-    }
-
-    .result-default {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .result-title {
-      font-size: 1.125em;
-      font-weight: 600;
-      color: #0066cc;
-    }
-
-    .result-title :deep(mark) {
-      background-color: #fff3cd;
-      font-weight: 700;
-      padding: 0 2px;
-    }
-
-    .result-description {
-      margin: 0;
-      color: #333;
-      line-height: 1.5;
-    }
-
-    .result-description :deep(mark) {
-      background-color: #fff3cd;
-      font-weight: 600;
-      padding: 0 2px;
-    }
-
-    .result-score {
-      font-size: 0.75em;
-      color: #999;
-    }
-
-    .result-metadata {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      font-size: 0.875em;
-      color: #666;
-    }
-
-    .metadata-item strong {
-      font-weight: 600;
-    }
-
-    .results-virtual-viewport {
-      overflow-y: auto;
-      position: relative;
-    }
-
-    .results-virtual-spacer {
-      position: relative;
-    }
-
-    .results-pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      padding: 24px 0;
-      border-top: 1px solid #e0e0e0;
-      margin-top: 24px;
-    }
-
-    .pagination-button {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.875em;
-      transition: all 0.2s;
-      min-width: 36px;
-    }
-
-    .pagination-button:hover:not(:disabled) {
-      background-color: #f5f5f5;
-      border-color: #999;
-    }
-
-    .pagination-button.active {
-      background-color: #0066cc;
-      color: white;
-      border-color: #0066cc;
-    }
-
-    .pagination-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .pagination-ellipsis {
-      padding: 8px 4px;
-      color: #999;
-    }
-
-    .page-size-select {
-      margin-left: 16px;
-    }
-  `],
   host: {
-    'class': 'ng-search-results',
-  }
+    class: 'ng-search-results',
+  },
 })
 export class ResultsComponent<T = any> {
   private readonly searchState = inject(SearchStateService, { optional: true });
@@ -491,7 +277,8 @@ export class ResultsComponent<T = any> {
   // Content projection for custom templates
   readonly customResultTemplate = contentChild<TemplateRef<ResultContext<T>>>('resultTemplate');
   readonly customLoadingTemplate = contentChild<TemplateRef<void>>('loadingTemplate');
-  readonly customErrorTemplate = contentChild<TemplateRef<{ $implicit: Error | null }>>('errorTemplate');
+  readonly customErrorTemplate =
+    contentChild<TemplateRef<{ $implicit: Error | null }>>('errorTemplate');
   readonly customEmptyTemplate = contentChild<TemplateRef<void>>('emptyTemplate');
 
   // Inputs - Display options
@@ -542,7 +329,7 @@ export class ResultsComponent<T = any> {
 
   // Computed signals from search state
   readonly results = computed(() => {
-    return this.searchState?.results() as SearchResult<T>[] ?? [];
+    return (this.searchState?.results() as SearchResult<T>[]) ?? [];
   });
 
   readonly isLoading = computed(() => {
@@ -676,6 +463,10 @@ export class ResultsComponent<T = any> {
    */
   selectResult(result: SearchResult<T>, index: number): void {
     this.resultClick.emit({ result, index });
+    this.searchState?.markResultClicked(result, {
+      index,
+      origin: 'component',
+    });
   }
 
   /**

@@ -1,0 +1,17 @@
+@layer ng-search.utilities {
+  :where(.ng-dashboard) {
+    display: grid;
+    gap: var(--ng-results-grid-gap, 1.25rem);
+    inline-size: min(100%, var(--ng-max-width-container, 90rem));
+    margin-inline: auto;
+    container-type: inline-size;
+    padding-inline: var(--ng-container-padding-inline, 1.5rem);
+  }
+
+  @container (min-width: 48rem) {
+    :where(.ng-dashboard) {
+      grid-template-columns: 18rem 1fr;
+      align-items: start;
+    }
+  }
+}

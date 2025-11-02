@@ -7,10 +7,7 @@ import { SearchQuery, FilterConfig, SortConfig } from '../types/search-types';
 /**
  * Build a search query with defaults
  */
-export function buildSearchQuery(
-  query: string,
-  options?: Partial<SearchQuery>
-): SearchQuery {
+export function buildSearchQuery(query: string, options?: Partial<SearchQuery>): SearchQuery {
   return {
     query,
     size: options?.size ?? 10,
@@ -24,10 +21,7 @@ export function buildSearchQuery(
 /**
  * Add filter to search query
  */
-export function addFilter(
-  query: SearchQuery,
-  filter: FilterConfig
-): SearchQuery {
+export function addFilter(query: SearchQuery, filter: FilterConfig): SearchQuery {
   return {
     ...query,
     filters: [...(query.filters || []), filter],
@@ -37,29 +31,20 @@ export function addFilter(
 /**
  * Remove filter from search query by field
  */
-export function removeFilter(
-  query: SearchQuery,
-  field: string
-): SearchQuery {
+export function removeFilter(query: SearchQuery, field: string): SearchQuery {
   return {
     ...query,
-    filters: (query.filters || []).filter(f => f.field !== field),
+    filters: (query.filters || []).filter((f) => f.field !== field),
   };
 }
 
 /**
  * Update filter in search query
  */
-export function updateFilter(
-  query: SearchQuery,
-  field: string,
-  value: any
-): SearchQuery {
+export function updateFilter(query: SearchQuery, field: string, value: any): SearchQuery {
   return {
     ...query,
-    filters: (query.filters || []).map(f =>
-      f.field === field ? { ...f, value } : f
-    ),
+    filters: (query.filters || []).map((f) => (f.field === field ? { ...f, value } : f)),
   };
 }
 
@@ -76,10 +61,7 @@ export function clearFilters(query: SearchQuery): SearchQuery {
 /**
  * Add or update sort in search query
  */
-export function setSort(
-  query: SearchQuery,
-  sort: SortConfig[]
-): SearchQuery {
+export function setSort(query: SearchQuery, sort: SortConfig[]): SearchQuery {
   return {
     ...query,
     sort,
@@ -89,11 +71,7 @@ export function setSort(
 /**
  * Set pagination in search query
  */
-export function setPagination(
-  query: SearchQuery,
-  page: number,
-  pageSize: number
-): SearchQuery {
+export function setPagination(query: SearchQuery, page: number, pageSize: number): SearchQuery {
   return {
     ...query,
     size: pageSize,
@@ -139,11 +117,7 @@ export function getTotalPages(total: number, pageSize: number): number {
 /**
  * Check if there's a next page
  */
-export function hasNextPage(
-  currentPage: number,
-  total: number,
-  pageSize: number
-): boolean {
+export function hasNextPage(currentPage: number, total: number, pageSize: number): boolean {
   return currentPage < getTotalPages(total, pageSize);
 }
 

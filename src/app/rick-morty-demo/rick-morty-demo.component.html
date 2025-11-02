@@ -1,16 +1,19 @@
 <div class="demo-container">
   <header class="demo-header">
-    <div class="header-nav">
-      <a routerLink="/" class="back-link">← Back to Angular Demo</a>
-    </div>
+    <nav class="header-nav">
+      <a routerLink="/" class="nav-link">🏠 Angular Guides</a>
+      <a routerLink="/rick-morty" class="nav-link">🛸 Rick & Morty</a>
+      <a routerLink="/countries" class="nav-link">🌍 World Atlas</a>
+    </nav>
     <h1>🛸 Rick and Morty Search</h1>
     <p>Search through all 826 characters from the Rick and Morty multiverse!</p>
   </header>
 
-  <div class="search-container">
+
+  <div class="search-area">
     <!-- Search Box with suggestions -->
     <div class="search-box-wrapper">
-      <ngs-search-box
+      <ng-search-box
         [value]="inputValue()"
         placeholder="Search for Rick, Morty, or any character..."
         [debounceTime]="300"
@@ -19,35 +22,38 @@
         [disableAutoSearch]="true"
         ariaLabel="Search Rick and Morty characters"
         (queryChange)="onQueryChange($event)"
-        (search)="onSearch($event)">
-
+        (search)="onSearch($event)"
+      >
         <!-- Custom search button -->
         <div searchActions class="custom-actions">
-          <button
-            type="button"
-            class="search-btn"
-            (click)="searchProvider.executeSearch()">
+          <button type="button" class="search-btn" (click)="searchProvider.executeSearch()">
             🔍 Search
           </button>
         </div>
-      </ngs-search-box>
+      </ng-search-box>
 
       <!-- Suggestions dropdown -->
       <ng-search-suggestions
         [maxSuggestions]="8"
         [autoHighlightFirst]="true"
         [showNoResults]="false"
-        (suggestionSelected)="onSuggestionSelected($event)">
-
+        (suggestionSelected)="onSuggestionSelected($event)"
+      >
         <!-- Custom suggestion template -->
-        <ng-template #suggestionTemplate let-suggestion let-index="index" let-highlighted="highlighted">
+        <ng-template
+          #suggestionTemplate
+          let-suggestion
+          let-index="index"
+          let-highlighted="highlighted"
+        >
           <div class="custom-suggestion" [class.active]="highlighted">
             @if (suggestion.metadata?.image) {
               <img
                 [src]="suggestion.metadata.image"
                 [alt]="suggestion.text"
                 class="suggestion-avatar"
-                loading="lazy" />
+                loading="lazy"
+              />
             }
             <div class="suggestion-content">
               <div class="suggestion-title">{{ suggestion.text }}</div>
@@ -63,138 +69,97 @@
         </ng-template>
       </ng-search-suggestions>
     </div>
+  </div>
 
-    <!-- Filters -->
-    <div class="filters-container">
-      <div class="filter-group">
-        <label class="filter-label">Status:</label>
-        <div class="filter-buttons">
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="selectedFilters().status === 'alive'"
-            (click)="filterByStatus('alive')">
-            🟢 Alive
-          </button>
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="selectedFilters().status === 'dead'"
-            (click)="filterByStatus('dead')">
-            🔴 Dead
-          </button>
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="selectedFilters().status === 'unknown'"
-            (click)="filterByStatus('unknown')">
-            ⚪ Unknown
-          </button>
-        </div>
+  <div class="content-layout">
+    <!-- Facets and Applied Filters -->
+    <aside class="facets-column">
+      <div class="facets-section">
+        <ng-applied-filters
+          [filters]="searchProvider.appliedFilters()"
+          [fieldLabels]="{
+            status: 'Status',
+            gender: 'Gender',
+            species: 'Species',
+          }"
+          (clearAll)="onClearAllFilters()"
+          (removeFilter)="onRemoveFilter($event)"
+        />
+
+        <ng-facets-container
+          [facets]="searchProvider.facets()"
+          [title]="'Filters'"
+          (facetChange)="onFacetChange($event)"
+          (toggleCollapse)="searchProvider.toggleFacetCollapsed($event)"
+        />
       </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Gender:</label>
-        <div class="filter-buttons">
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="selectedFilters().gender === 'male'"
-            (click)="filterByGender('male')">
-            👨 Male
-          </button>
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="selectedFilters().gender === 'female'"
-            (click)="filterByGender('female')">
-            👩 Female
-          </button>
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="selectedFilters().gender === 'genderless'"
-            (click)="filterByGender('genderless')">
-            ⚧ Genderless
-          </button>
-        </div>
-      </div>
-
-      @if (hasActiveFilters()) {
-        <button
-          type="button"
-          class="clear-filters-btn"
-          (click)="clearFilters()">
-          ✕ Clear all filters
-        </button>
-      }
-    </div>
+    </aside>
 
     <!-- Search Results -->
-    <ng-search-results
-      [pageSize]="20"
-      [showPagination]="true"
-      [enableVirtualScroll]="false"
-      [highlightQuery]="false"
-      (pageChange)="onPageChange($event)"
-      emptyMessage="No characters found. Try searching for 'Rick' or 'Morty'!">,
-
-      <!-- Custom result template -->
-      <ng-template #resultTemplate let-result let-index="index">
-        <div class="character-card">
-          <div class="character-image">
-            <img
-              [src]="result.data.image"
-              [alt]="result.data.name"
-              loading="lazy" />
-            <span class="status-badge" [attr.data-status]="result.data.status">
-              {{ result.data.status }}
-            </span>
-          </div>
-
-          <div class="character-info">
-            <h3 class="character-name">{{ result.data.name }}</h3>
-
-            <div class="character-details">
-              <div class="detail-row">
-                <span class="detail-label">Species:</span>
-                <span class="detail-value">{{ result.data.species }}</span>
-                @if (result.data.type) {
-                  <span class="detail-type">({{ result.data.type }})</span>
-                }
-              </div>
-
-              <div class="detail-row">
-                <span class="detail-label">Gender:</span>
-                <span class="detail-value">{{ result.data.gender }}</span>
-              </div>
-
-              <div class="detail-row">
-                <span class="detail-label">Origin:</span>
-                <span class="detail-value">{{ result.data.origin.name }}</span>
-              </div>
-
-              <div class="detail-row">
-                <span class="detail-label">Last Location:</span>
-                <span class="detail-value">{{ result.data.location.name }}</span>
-              </div>
-
-              <div class="detail-row">
-                <span class="detail-label">Episodes:</span>
-                <span class="detail-value">{{ result.data.episode.length }} appearances</span>
-              </div>
+    <main class="results-column">
+      <ng-search-results
+        [pageSize]="20"
+        [showPagination]="true"
+        [enableVirtualScroll]="false"
+        [highlightQuery]="false"
+        (pageChange)="onPageChange($event)"
+        emptyMessage="No characters found. Try searching for 'Rick' or 'Morty'!"
+      >
+        <!-- Custom result template -->
+        <ng-template #resultTemplate let-result let-index="index">
+          <div class="character-card">
+            <div class="character-image">
+              <img [src]="result.data.image" [alt]="result.data.name" loading="lazy" />
+              <span class="status-badge" [attr.data-status]="result.data.status">
+                {{ result.data.status }}
+              </span>
             </div>
 
-            <a
-              [href]="result.data.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="view-details-link">
-              View API Details →
-            </a>
+            <div class="character-info">
+              <h3 class="character-name">{{ result.data.name }}</h3>
+
+              <div class="character-details">
+                <div class="detail-row">
+                  <span class="detail-label">Species:</span>
+                  <span class="detail-value">{{ result.data.species }}</span>
+                  @if (result.data.type) {
+                    <span class="detail-type">({{ result.data.type }})</span>
+                  }
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Gender:</span>
+                  <span class="detail-value">{{ result.data.gender }}</span>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Origin:</span>
+                  <span class="detail-value">{{ result.data.origin.name }}</span>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Last Location:</span>
+                  <span class="detail-value">{{ result.data.location.name }}</span>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Episodes:</span>
+                  <span class="detail-value">{{ result.data.episode.length }} appearances</span>
+                </div>
+              </div>
+
+              <a
+                [href]="result.data.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="view-details-link"
+              >
+                View API Details →
+              </a>
+            </div>
           </div>
-        </div>
-      </ng-template>
-    </ng-search-results>
+        </ng-template>
+      </ng-search-results>
+    </main>
   </div>
 </div>

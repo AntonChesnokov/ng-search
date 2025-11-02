@@ -1,0 +1,50 @@
+@layer ng-search.components {
+  :where(.ng-facets-container) {
+    display: grid;
+    gap: var(--ng-space-sm, 0.75rem);
+    color: var(--ng-color-text-primary, #0f172a);
+  }
+
+  :where(.ng-facets-title) {
+    margin: 0;
+    font-size: var(--ng-font-size-lg, 1.25rem);
+    font-weight: var(--ng-font-weight-semibold, 600);
+  }
+
+  :where(.ng-facets-empty) {
+    padding-block: var(--ng-space-sm, 0.75rem);
+    padding-inline: var(--ng-space-md, 1rem);
+    text-align: center;
+    font-size: var(--ng-font-size-sm, 0.875rem);
+    color: var(--ng-color-text-muted, #64748b);
+    background: color-mix(in srgb, var(--ng-color-bg-surface, #f8fafc) 85%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--ng-color-border, #e2e8f0) 75%, transparent);
+    border-radius: var(--ng-radius-md, 0.5rem);
+  }
+
+  :where(.ng-facets-clear-all) {
+    inline-size: 100%;
+    padding-block: var(--ng-space-sm, 0.75rem);
+    padding-inline: var(--ng-space-md, 1rem);
+    border: none;
+    border-radius: var(--ng-radius-md, 0.5rem);
+    background: var(--ng-color-primary, #2563eb);
+    color: var(--ng-color-primary-contrast, #f8fafc);
+    font-weight: var(--ng-font-weight-semibold, 600);
+    cursor: pointer;
+    transition:
+      transform var(--ng-transition-fast, 150ms ease-in-out),
+      box-shadow var(--ng-transition-fast, 150ms ease-in-out);
+    box-shadow: var(--ng-shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.08));
+  }
+
+  :where(.ng-facets-clear-all:hover) {
+    transform: translateY(-1px);
+    box-shadow: var(--ng-shadow-md, 0 10px 30px -12px rgba(15, 23, 42, 0.25));
+  }
+
+  :where(.ng-facets-clear-all:focus-visible) {
+    outline: 2px solid var(--ng-color-focus, #1d4ed8);
+    outline-offset: 2px;
+  }
+}

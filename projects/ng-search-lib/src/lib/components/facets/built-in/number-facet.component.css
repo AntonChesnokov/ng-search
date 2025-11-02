@@ -1,0 +1,66 @@
+@layer ng-search.components {
+  :where(.ng-number-input-container) {
+    display: flex;
+    align-items: center;
+    gap: var(--ng-space-xs, 0.5rem);
+  }
+
+  :where(.ng-number-input) {
+    flex: 1 1 auto;
+    padding-block: var(--ng-space-2xs, 0.25rem);
+    padding-inline: var(--ng-space-sm, 0.75rem);
+    border: 1px solid var(--ng-color-border, #e2e8f0);
+    border-radius: var(--ng-radius-sm, 0.375rem);
+    background: var(--ng-color-bg-elevated, #ffffff);
+    font-size: var(--ng-font-size-sm, 0.875rem);
+    transition:
+      border-color var(--ng-transition-fast, 150ms ease-in-out),
+      box-shadow var(--ng-transition-fast, 150ms ease-in-out);
+  }
+
+  :where(.ng-number-input:focus-visible) {
+    border-color: var(--ng-color-focus, #1d4ed8);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ng-color-focus, #1d4ed8) 25%, transparent);
+    outline: none;
+  }
+
+  :where(.ng-number-input:invalid) {
+    border-color: var(--ng-color-danger, #dc2626);
+  }
+
+  :where(.ng-number-apply) {
+    border: none;
+    border-radius: var(--ng-radius-sm, 0.375rem);
+    background: var(--ng-color-primary, #2563eb);
+    color: var(--ng-color-primary-contrast, #f8fafc);
+    padding-block: var(--ng-space-2xs, 0.25rem);
+    padding-inline: var(--ng-space-sm, 0.75rem);
+    font-size: var(--ng-font-size-sm, 0.875rem);
+    font-weight: var(--ng-font-weight-medium, 500);
+    cursor: pointer;
+    transition: background-color var(--ng-transition-fast, 150ms ease-in-out);
+  }
+
+  :where(.ng-number-apply:hover:not(:disabled)) {
+    background: color-mix(in srgb, var(--ng-color-primary, #2563eb) 85%, black 15%);
+  }
+
+  :where(.ng-number-apply:disabled) {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  :where(.ng-number-error) {
+    margin-block-start: var(--ng-space-2xs, 0.25rem);
+    padding: var(--ng-space-2xs, 0.25rem) var(--ng-space-sm, 0.75rem);
+    background: color-mix(in srgb, var(--ng-color-danger, #dc2626) 12%, transparent);
+    border-radius: var(--ng-radius-sm, 0.375rem);
+    font-size: var(--ng-font-size-xs, 0.75rem);
+    color: var(--ng-color-danger, #dc2626);
+  }
+
+  :where(.ng-number-hint) {
+    font-size: var(--ng-font-size-xs, 0.75rem);
+    color: var(--ng-color-text-muted, #64748b);
+  }
+}

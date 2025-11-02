@@ -6,11 +6,19 @@
 }
 
 .demo-container {
+  --ng-surface: rgba(15, 23, 42, 0.92);
+  --ng-surface-2: rgba(26, 35, 58, 0.96);
+  --ng-border: #334155;
+  --ng-text: #e2e8f0;
+  --ng-muted: #94a3b8;
+  --ng-accent: #22d3ee; /* можно подстроить под бренд */
+
   max-width: 100%;
   width: 100%;
   margin: 0;
   padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   min-height: 100vh;
   overflow-x: hidden;
@@ -30,6 +38,27 @@
   text-align: left;
   margin-bottom: 1rem;
 }
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(102, 126, 234, 0.12);
+  color: #00d9ff;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+
+.nav-link:hover {
+  transform: translateY(-1px);
+  background: rgba(102, 126, 234, 0.22);
+}
+
 
 .back-link {
   color: #00d9ff;
@@ -61,15 +90,15 @@
   margin: 0;
 }
 
-.search-container {
+.search-area {
   max-width: 1400px;
   margin: 0 auto;
-  overflow-x: hidden;
   box-sizing: border-box;
   width: 100%;
+  margin-bottom: 2.5rem;
 }
 
-.search-container > * {
+.search-area > * {
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -79,6 +108,7 @@
   margin-bottom: 2rem;
   width: 100%;
   box-sizing: border-box;
+  z-index: 10;
 }
 
 /* Custom Search Actions */
@@ -165,92 +195,65 @@
   margin-left: 4px;
 }
 
-.status-dot[data-status="Alive"] {
+.status-dot[data-status='Alive'] {
   background: #48bb78;
 }
 
-.status-dot[data-status="Dead"] {
+.status-dot[data-status='Dead'] {
   background: #f56565;
 }
 
-.status-dot[data-status="unknown"] {
+.status-dot[data-status='unknown'] {
   background: #a0aec0;
 }
 
 /* Filters */
-.filters-container {
-  background: #1a1a2e;
+/* Facets Section */
+.content-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  align-items: start;
+}
+
+.facets-column {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+  min-width: 0;
+}
+
+.facets-section {
+  background: rgba(26, 35, 58, 0.9);
   border: 2px solid #2d3748;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.filter-group {
-  margin-bottom: 1rem;
-}
-
-.filter-group:last-of-type {
-  margin-bottom: 0;
-}
-
-.filter-label {
-  display: block;
-  color: #a0aec0;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.75rem;
-}
-
-.filter-buttons {
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 20px 60px rgba(14, 23, 38, 0.35);
 }
 
-.filter-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 2px solid #2d3748;
-  border-radius: 8px;
-  background: transparent;
-  color: #a0aec0;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.facets-section ng-applied-filters {
+  display: block;
 }
 
-.filter-btn:hover {
-  border-color: #00d9ff;
-  color: #00d9ff;
-  transform: translateY(-1px);
+.facets-section ng-facets-container {
+  display: block;
 }
 
-.filter-btn.active {
-  background: linear-gradient(135deg, #00d9ff 0%, #00ffcc 100%);
-  border-color: transparent;
-  color: #1a1a2e;
-  font-weight: 600;
+.results-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.clear-filters-btn {
-  margin-top: 1rem;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 2px solid #f56565;
-  border-radius: 8px;
-  background: transparent;
-  color: #f56565;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.clear-filters-btn:hover {
-  background: #f56565;
-  color: white;
+.results-column ng-search-results {
+  width: 100%;
 }
 
 /* Character Card */
@@ -301,17 +304,17 @@
   backdrop-filter: blur(10px);
 }
 
-.status-badge[data-status="Alive"] {
+.status-badge[data-status='Alive'] {
   background: rgba(72, 187, 120, 0.9);
   color: white;
 }
 
-.status-badge[data-status="Dead"] {
+.status-badge[data-status='Dead'] {
   background: rgba(245, 101, 101, 0.9);
   color: white;
 }
 
-.status-badge[data-status="unknown"] {
+.status-badge[data-status='unknown'] {
   background: rgba(160, 174, 192, 0.9);
   color: white;
 }
@@ -394,10 +397,6 @@
     overflow-x: hidden;
   }
 
-  .search-container {
-    overflow-x: hidden;
-  }
-
   .demo-header h1 {
     font-size: 2rem;
     word-wrap: break-word;
@@ -407,34 +406,18 @@
     font-size: 1rem;
   }
 
-  /* Filters mobile styles */
-  .filters-container {
-    padding: 1rem;
+  /* Facets mobile styles */
+  .content-layout {
+    grid-template-columns: 1fr;
   }
 
-  .filter-group {
-    margin-bottom: 1.25rem;
-  }
-
-  .filter-label {
-    text-align: center;
-    margin-bottom: 0.5rem;
-  }
-
-  .filter-buttons {
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .filter-btn {
-    padding: 6px 12px;
-    font-size: 13px;
-    flex: 0 0 auto;
-  }
-
-  .clear-filters-btn {
+  .facets-column {
+    position: static;
     width: 100%;
-    margin-top: 0.75rem;
+  }
+
+  .facets-section {
+    margin-bottom: 1.5rem;
   }
 
   /* Character cards mobile styles */
@@ -507,21 +490,21 @@
   }
 
   /* Deep selector for library component */
-  ngs-search-box {
+  ng-search-box {
     display: block;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
   }
 
-  ngs-search-box .ngs-search-input-wrapper {
+  ng-search-box .ng-search-input-wrapper {
     display: block !important;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
   }
 
-  ngs-search-box .ngs-input-container {
+  ng-search-box .ng-input-container {
     display: block;
     margin-bottom: 8px;
     width: 100%;
@@ -529,7 +512,7 @@
     box-sizing: border-box;
   }
 
-  ngs-search-box input {
+  ng-search-box input {
     font-size: 16px;
     padding: 14px 16px;
     width: 100%;
@@ -537,7 +520,7 @@
     box-sizing: border-box;
   }
 
-  ngs-search-box [searchActions] {
+  ng-search-box [searchActions] {
     display: block !important;
     max-width: 100%;
     box-sizing: border-box;
@@ -552,30 +535,30 @@
 
 /* Override library styles for dark theme */
 :host ::ng-deep {
-  ngs-search-box input {
+  ng-search-box input {
     background: #1a1a2e;
     border-color: #2d3748;
     color: #ffffff;
   }
 
-  ngs-search-box input:focus {
+  ng-search-box input:focus {
     border-color: #00d9ff;
     box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
   }
 
-  ngs-search-box input::placeholder {
+  ng-search-box input::placeholder {
     color: #a0aec0;
   }
 
-  .ngs-search-icon {
+  .ng-search-icon {
     color: #00d9ff;
   }
 
-  .ngs-clear-button {
+  .ng-clear-button {
     color: #a0aec0;
   }
 
-  .ngs-clear-button:hover {
+  .ng-clear-button:hover {
     background: #2d3748;
     color: #ffffff;
   }
@@ -585,20 +568,20 @@
     border: 2px solid #2d3748;
   }
 
-  .ngs-empty-state,
-  .ngs-loading-state {
+  .ng-empty-state,
+  .ng-loading-state {
     color: #a0aec0;
   }
 
   /* Mobile optimizations for search input */
   @media (max-width: 768px) {
-    ngs-search-box {
+    ng-search-box {
       display: block;
       width: 100%;
       box-sizing: border-box;
     }
 
-    ngs-search-box input {
+    ng-search-box input {
       font-size: 16px;
       padding: 14px 16px;
       padding-left: 44px;
@@ -606,20 +589,20 @@
       box-sizing: border-box;
     }
 
-    .ngs-search-input-wrapper {
+    .ng-search-input-wrapper {
       display: block !important;
       width: 100%;
       box-sizing: border-box;
     }
 
-    .ngs-input-container {
+    .ng-input-container {
       width: 100%;
       box-sizing: border-box;
       display: block;
       margin-bottom: 8px;
     }
 
-    ngs-search-box [searchActions] {
+    ng-search-box [searchActions] {
       display: block;
       width: 100%;
       box-sizing: border-box;

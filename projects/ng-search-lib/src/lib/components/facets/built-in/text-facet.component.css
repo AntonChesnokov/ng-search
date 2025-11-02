@@ -1,0 +1,57 @@
+@layer ng-search.components {
+  :where(.ng-text-facet .ng-facet-search) {
+    display: grid;
+    gap: var(--ng-space-2xs, 0.25rem);
+  }
+
+  :where(.ng-facet-search-input) {
+    inline-size: 100%;
+    padding-block: var(--ng-space-2xs, 0.25rem);
+    padding-inline: var(--ng-space-sm, 0.75rem);
+    border: 1px solid var(--ng-color-border, #e2e8f0);
+    border-radius: var(--ng-radius-sm, 0.375rem);
+    background: var(--ng-color-bg-elevated, #ffffff);
+    font-size: var(--ng-font-size-sm, 0.875rem);
+    color: var(--ng-color-text-primary, #0f172a);
+    transition:
+      border-color var(--ng-transition-fast, 150ms ease-in-out),
+      box-shadow var(--ng-transition-fast, 150ms ease-in-out);
+  }
+
+  :where(.ng-facet-search-input:focus-visible) {
+    border-color: var(--ng-color-focus, #1d4ed8);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ng-color-focus, #1d4ed8) 25%, transparent);
+    outline: none;
+  }
+
+  :where(.ng-facet-values) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ng-space-2xs, 0.25rem);
+  }
+
+  :where(.ng-facet-value) {
+    display: flex;
+    align-items: center;
+    gap: var(--ng-space-xs, 0.5rem);
+    font-size: var(--ng-font-size-sm, 0.875rem);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  :where(.ng-facet-value input) {
+    accent-color: var(--ng-color-primary, #2563eb);
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  :where(.ng-facet-value-disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  :where(.ng-facet-value-count) {
+    font-size: var(--ng-font-size-xs, 0.75rem);
+    color: var(--ng-color-text-muted, #64748b);
+  }
+}

@@ -1,0 +1,18 @@
+@layer ng-search.utilities {
+  :where(.ng-stack) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ng-space-sm, 0.75rem);
+  }
+
+  :where(.ng-inline-stack) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ng-space-xs, 0.5rem);
+  }
+
+  :where(.ng-section) {
+    padding-block: var(--ng-space-md, 1rem);
+    padding-inline: var(--ng-container-padding-inline, 1.5rem);
+  }
+}

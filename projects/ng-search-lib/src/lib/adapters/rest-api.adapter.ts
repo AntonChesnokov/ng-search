@@ -42,10 +42,8 @@ export class RestApiAdapter<T = any> extends BaseHttpAdapter<T> {
     const body = this.buildSearchRequest(query);
 
     // Execute request
-    return this.executeRequest(
-      this.http.post<any>(url, body, { headers })
-    ).pipe(
-      map(response => this.parseSearchResponse(response))
+    return this.executeRequest(this.http.post<any>(url, body, { headers })).pipe(
+      map((response) => this.parseSearchResponse(response))
     );
   }
 
@@ -63,10 +61,8 @@ export class RestApiAdapter<T = any> extends BaseHttpAdapter<T> {
       fuzzy: options?.fuzzy ?? false,
     };
 
-    return this.executeRequest(
-      this.http.post<any>(url, body, { headers })
-    ).pipe(
-      map(response => this.parseSuggestResponse(response))
+    return this.executeRequest(this.http.post<any>(url, body, { headers })).pipe(
+      map((response) => this.parseSuggestResponse(response))
     );
   }
 
@@ -77,10 +73,8 @@ export class RestApiAdapter<T = any> extends BaseHttpAdapter<T> {
     const url = `${this.config.endpoint}/document/${id}`;
     const headers = this.createHeaders();
 
-    return this.executeRequest(
-      this.http.get<any>(url, { headers })
-    ).pipe(
-      map(response => response?.data ?? null)
+    return this.executeRequest(this.http.get<any>(url, { headers })).pipe(
+      map((response) => response?.data ?? null)
     );
   }
 
@@ -95,7 +89,7 @@ export class RestApiAdapter<T = any> extends BaseHttpAdapter<T> {
       from: query.from ?? 0,
       fields: query.fields,
       sort: query.sort,
-      filters: query.filters?.map(f => ({
+      filters: query.filters?.map((f) => ({
         field: f.field,
         type: f.type,
         value: f.value,

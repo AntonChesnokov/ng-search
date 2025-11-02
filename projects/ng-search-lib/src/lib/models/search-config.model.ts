@@ -16,19 +16,22 @@ export class SearchConfigModel implements SearchConfig {
   defaultSort?: SortConfig[];
   enableHighlighting: boolean;
   highlightFields?: string[];
+  eventHistoryLimit: number | null;
 
   constructor(config?: Partial<SearchConfig>) {
     // Set defaults
     this.debounceTime = config?.debounceTime ?? 300;
     this.minQueryLength = config?.minQueryLength ?? 1;
     this.pageSize = config?.pageSize ?? 10;
-    this.autoSearch = config?.autoSearch ?? true; // Default to true for backward compatibility
+    this.autoSearch = config?.autoSearch ?? true;
     this.enableSuggestions = config?.enableSuggestions ?? true;
     this.enableAggregations = config?.enableAggregations ?? true;
     this.enableHighlighting = config?.enableHighlighting ?? true;
     this.searchFields = config?.searchFields;
     this.defaultSort = config?.defaultSort;
     this.highlightFields = config?.highlightFields;
+    this.eventHistoryLimit =
+      config?.eventHistoryLimit !== undefined ? config.eventHistoryLimit! : 100;
 
     this.validate();
   }
@@ -45,6 +48,9 @@ export class SearchConfigModel implements SearchConfig {
     }
     if (this.pageSize < 1) {
       throw new Error('pageSize must be at least 1');
+    }
+    if (this.eventHistoryLimit !== null && this.eventHistoryLimit < 0) {
+      throw new Error('eventHistoryLimit must be null or a non-negative number');
     }
   }
 
@@ -73,6 +79,7 @@ export class SearchConfigModel implements SearchConfig {
       defaultSort: this.defaultSort,
       enableHighlighting: this.enableHighlighting,
       highlightFields: this.highlightFields,
+      eventHistoryLimit: this.eventHistoryLimit,
     };
   }
 }

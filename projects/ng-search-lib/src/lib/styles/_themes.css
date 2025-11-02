@@ -1,0 +1,32 @@
+@layer ng-search.theme {
+  :where(:root[data-theme='dark']) {
+    --ng-color-bg-app: #0f172a;
+    --ng-color-bg-surface: #111827;
+    --ng-color-bg-elevated: #1f2937;
+    --ng-color-border: #1f2937;
+    --ng-color-border-strong: #334155;
+    --ng-color-text-primary: #e2e8f0;
+    --ng-color-text-secondary: #cbd5f5;
+    --ng-color-text-muted: #94a3b8;
+    --ng-color-primary: #60a5fa;
+    --ng-color-primary-contrast: #0b1120;
+    --ng-color-accent: #34d399;
+    --ng-color-danger: #f87171;
+    --ng-color-focus: #93c5fd;
+    --ng-color-overlay: rgba(2, 6, 23, 0.65);
+    color-scheme: dark;
+  }
+
+  :where(:root[data-theme='contrast']) {
+    --ng-color-bg-app: #ffffff;
+    --ng-color-bg-surface: #ffffff;
+    --ng-color-bg-elevated: #ffffff;
+    --ng-color-border: #111827;
+    --ng-color-text-primary: #111827;
+    --ng-color-text-secondary: #111827;
+    --ng-color-text-muted: #111827;
+    --ng-color-primary: #111827;
+    --ng-color-primary-contrast: #ffffff;
+    --ng-color-focus: #111827;
+  }
+}

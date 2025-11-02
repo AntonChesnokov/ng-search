@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ResultsComponent } from './results.component';
 import { SearchStateService } from '../../services/search-state.service';
 import { SSRSafeService } from '../../services/ssr-safe.service';
@@ -40,6 +40,7 @@ describe('ResultsComponent', () => {
       sort: signal([]),
       setPagination: jasmine.createSpy('setPagination'),
       setSort: jasmine.createSpy('setSort'),
+      markResultClicked: jasmine.createSpy('markResultClicked'),
     };
 
     mockSSRSafe = {
@@ -51,6 +52,7 @@ describe('ResultsComponent', () => {
       providers: [
         { provide: SearchStateService, useValue: mockSearchState },
         { provide: SSRSafeService, useValue: mockSSRSafe },
+        provideZonelessChangeDetection(),
       ],
     }).compileComponents();
 
@@ -225,9 +227,7 @@ describe('ResultsComponent', () => {
 
     component.onSortChange(event);
 
-    expect(mockSearchState.setSort).toHaveBeenCalledWith([
-      { field: 'title', order: 'asc' },
-    ]);
+    expect(mockSearchState.setSort).toHaveBeenCalledWith([{ field: 'title', order: 'asc' }]);
   });
 
   it('should emit sortChange event', () => {
@@ -279,7 +279,6 @@ describe('ResultsComponent', () => {
 
     const highlighted = component.highlightText('Learn Angular basics', 'angular');
 
-    // The regex is case-insensitive, so it matches both 'angular' and 'Angular'
     expect(highlighted).toContain('<mark>');
     expect(highlighted.toLowerCase()).toContain('<mark>angular</mark>');
   });
@@ -363,7 +362,7 @@ describe('ResultsComponent', () => {
     fixture.componentRef.setInput('itemHeight', 100);
     fixture.detectChanges();
 
-    expect(component.totalVirtualHeight()).toBe(300); // 3 results * 100px
+    expect(component.totalVirtualHeight()).toBe(300);
   });
 
   it('should slice results for virtual scrolling', () => {
